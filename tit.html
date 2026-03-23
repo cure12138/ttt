@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>绿茶餐厅 </title>
+    <style>
+        * {
+            margin:0; padding:0; box-sizing:border-box; user-select:none;
+        }
+        body {
+            display:flex; justify-content:center; align-items:center; min-height:100vh;
+            background:#d1f5e9; font-family:"Microsoft YaHei",sans-serif;
+        }
+        #game {
+            position:relative; width:420px; height:650px;
+            border:3px solid #2a7e5b; overflow:hidden;
+            background:#f0fff8; 
+	        background-image: url('https://www.china-greentea.com.cn/static/cms/images/banner-history.jpg');
+            background-size: cover;
+            background-position: center;
+	        border-radius:10px;
+        }
+        .title {
+            position:absolute; top:20px; width:100%; text-align:center;
+            font-size:32px; font-weight:bold; color:#1e6b4b;
+            z-index:100; text-shadow:1px 1px 3px #fff;
+        }
+        #pauseBtn {
+            position:absolute; top:20px; right:20px;
+            width:40px; height:40px;
+            background:#2a9e6c; color:white;
+            border:none; border-radius:50%;
+            font-size:20px; font-weight:bold;
+            cursor:pointer; z-index:999;
+            box-shadow:0 2px 5px rgba(0,0,0,0.2);
+        }
+        #pauseBtn:hover {
+            background:#1f7c53;
+        }
+        #bird {
+            position:absolute; width:44px; height:40px;
+            background-image: url('https://ts1.tc.mm.bing.net/th/id/R-C.567e72625ae82468e5116ce92dc24bde?rik=kqrAxxOrUhrXPg&riu=http%3a%2f%2fassets1.ignimgs.com%2f2014%2f01%2f31%2fflappy-bird-buttonjpg-e984c2.jpg&ehk=vGlEeny7R2EyaMcNMlj4nt4YJPLB2BBtN8wG2799dWE%3d&risl=&pid=ImgRaw&r=0');
+            background-size:cover; background-position:center;
+            top:280px; left:100px; z-index:10;
+        }
+        .pipe {
+            position:absolute; width:70px;
+            background-image:url('https://tse1-mm.cn.bing.net/th/id/OIP-C.loI6dgm67OFr14RDdenrOwAAAA?w=269&h=180&c=7&r=0&o=7&pid=1.7&rm=3');
+            background-size:cover; border:2px solid #1a5942;
+        }
+        .item-box {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            z-index: 5;
+            text-align: center;
+        }
+        .item {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+        .item-text {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(0,0,0,0.6);
+            padding: 1px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        #score {
+            position:absolute; top:70px; left:20px;
+            font-size:26px; font-weight:bold; color:#1e6b4b; z-index:999;
+        }
+
+        /* 得分奖励弹窗 */
+        #rewardPopup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a7e5b;
+            text-align: center;
+            z-index: 9999;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        #startScreen {
+            position:absolute; width:100%; height:100%;
+            background:rgba(255,255,255,0.95); z-index:9999;
+            display:flex; flex-direction:column; justify-content:center; align-items:center;
+            border-radius:7px;
+        }
+        #startScreen h1 { font-size:36px; color:#1e6b4b; margin-bottom:10px; }
+        #startScreen .rule {
+            font-size:17px; color:#c0392b;
+            margin:6px 0;
+            font-weight:bold;
+        }
+        #startBtn {
+            padding:14px 36px; font-size:22px; background:#2a9e6c;
+            color:white; border:none; border-radius:50px; cursor:pointer;
+            box-shadow:0 4px 10px rgba(0,0,0,0.2); margin-top:20px;
+        }
+
+        #pauseScreen {
+            position:absolute; width:100%; height:100%;
+            background:rgba(0,0,0,0.7); z-index:9998;
+            display:none; flex-direction:column; justify-content:center; align-items:center;
+            color:white; font-size:32px; font-weight:bold;
+        }
+        #pauseScore { margin:10px 0; font-size:24px; }
+        .history { font-size:16px; margin:5px 0; color:#fff; }
+        #resumeBtn {
+            padding:12px 30px; font-size:22px; background:#2a9e6c;
+            color:white; border:none; border-radius:50px; cursor:pointer; margin-top:10px;
+        }
+
+        #gameOver {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            font-size:40px; color:#fff; font-weight:bold; text-shadow:2px 2px 4px #000;
+            display:none; z-index:9999; text-align:center;
+            background:rgba(0,0,0,0.6); padding:30px; border-radius:10px;
+        }
+        #restartBtn {
+            margin-top:20px; padding:10px 24px; font-size:20px;
+            background:white; border:2px solid #2a7e5b; border-radius:8px; cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <div class="title">绿茶餐厅</div>
+        <button id="pauseBtn">⏸</button>
+        <div id="bird"></div>
+        <div id="score">得分: 0</div>
+
+        <!-- 奖励弹窗 -->
+        <div id="rewardPopup"></div>
+
+        <!-- 开始界面 -->
+        <div id="startScreen">
+            <h1>绿茶餐厅等位小游戏</h1>
+            <div class="rule">🎯 33分 送 小锅土豆一份</div>
+            <div class="rule">🎯 66分 送 面包诱惑一份</div>
+            <div class="rule">🎯 88分 送 东坡仔排一份</div>
+            <button id="startBtn">开始游戏</button>
+        </div>
+
+        <!-- 暂停界面 -->
+        <div id="pauseScreen">
+            游戏已暂停
+            <div id="pauseScore">当前分数：0</div>
+            <div class="history" id="pauseHistory"></div>
+            <button id="resumeBtn">继续游戏</button>
+        </div>
+
+        <!-- 结束界面 -->
+        <div id="gameOver">
+            游戏结束
+            <br>
+            <div class="history" id="overHistory"></div>
+            <button id="restartBtn">再来一局</button>
+        </div>
+    </div>
+
+    <script>
+        const game = document.getElementById('game');
+        const bird = document.getElementById('bird');
+        const scoreText = document.getElementById('score');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const pauseScore = document.getElementById('pauseScore');
+        const pauseHistory = document.getElementById('pauseHistory');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const gameOverScreen = document.getElementById('gameOver');
+        const overHistory = document.getElementById('overHistory');
+        const restartBtn = document.getElementById('restartBtn');
+        const rewardPopup = document.getElementById('rewardPopup');
+
+        // 游戏参数
+        let birdTop = 280;
+        let gravity = 2.3;
+        let jump = -50;
+        let isGameStart = false;
+        let isGameOver = false;
+        let isPaused = false;
+
+        let score = 0;
+        let pipeSpeed = 3.2;
+        const pipeGap = 220;
+        let pipes = [];
+        let items = [];
+        let speedTimer = 0;
+
+        // 奖励记录
+        let reward33 = false;
+        let reward66 = false;
+        let reward88 = false;
+
+        // ==============================================
+        // ✅ 带过期时间的本地存储（1小时后自动清除）
+        // ==============================================
+        const SCORE_KEY = 'greentea_scores';
+        const EXPIRY_HOUR = 1; // 1小时过期
+        const EXPIRY_MS = EXPIRY_HOUR * 60 * 60 * 1000;
+
+        // 存储带过期时间的分数记录
+        function setScoresWithExpiry(scores) {
+            const now = Date.now();
+            const data = {
+                value: scores,
+                expiry: now + EXPIRY_MS
+            };
+            localStorage.setItem(SCORE_KEY, JSON.stringify(data));
+        }
+
+        // 获取分数记录，过期则清空
+        function getScoresWithExpiry() {
+            const itemStr = localStorage.getItem(SCORE_KEY);
+            if (!itemStr) return [];
+            
+            try {
+                const item = JSON.parse(itemStr);
+                const now = Date.now();
+                // 已过期，清除并返回空数组
+                if (now > item.expiry) {
+                    localStorage.removeItem(SCORE_KEY);
+                    return [];
+                }
+                return item.value || [];
+            } catch (e) {
+                localStorage.removeItem(SCORE_KEY);
+                return [];
+            }
+        }
+
+        // 历史最高分（自动处理过期）
+        let scoreHistory = getScoresWithExpiry();
+
+        // 道具
+        const itemTypes = [
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20241129/e95fa458f6a0631088bf266b3c15939e.jpg', score:1, text:"东坡仔排" },
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20241129/3e287945694eb9e6c3c1eea18ace8148.jpg', score:1, text:"面包诱惑" },
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20241129/d03476348ff6d0064a5d90a44a4d19a5.jpg', score:1, text:"龙井烤鸡" },
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20241129/e49bd09b08421c3c20c0982c8ce287f1.jpg', score:1, text:"石锅西施豆腐" },
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20250306/a50c1c292f83821eebaedff013665cb6.jpg', score:1, text:"粉丝裹虾" },
+            { img: 'https://www.china-greentea.com.cn/uploads/upload/images/20250314/030d2b2153a80327f306051296596abf.jpg', score:1, text:"葱香烤肉" }
+        ];
+
+        // 显示历史前三
+        function showHistory() {
+            let top3 = [...scoreHistory].sort((a,b)=>b-a).slice(0,3);
+            let txt = "🏆 历史最高分：\n";
+            top3.forEach((s,i)=>{ txt+=(i+1)+"--"+s+"分 " });
+            pauseHistory.innerText = txt;
+            overHistory.innerText = txt;
+        }
+
+        // 得分奖励检测
+        function checkReward() {
+            if(score>=33 && !reward33){
+                reward33=true;
+                showReward("恭喜达到33分！\n获得 小锅土豆 一份");
+            }
+            if(score>=66 && !reward66){
+                reward66=true;
+                showReward("恭喜达到66分！\n获得 面包诱惑 一份");
+            }
+            if(score>=88 && !reward88){
+                reward88=true;
+                showReward("恭喜达到88分！\n获得 东坡仔排 一份");
+            }
+        }
+
+        function showReward(msg) {
+            rewardPopup.innerText = msg;
+            rewardPopup.style.display = "block";
+            setTimeout(()=>rewardPopup.style.display="none", 2200);
+        }
+
+        function updateScore() {
+            scoreText.innerText = '得分: '+score;
+            pauseScore.innerText = '当前分数：'+score;
+            checkReward();
+        }
+
+        // 游戏结束保存分数（带过期）
+        function gameOver() {
+            isGameOver=true;
+            scoreHistory.push(score);
+            setScoresWithExpiry(scoreHistory); // 保存并更新过期时间
+            showHistory();
+            gameOverScreen.style.display='block';
+        }
+
+        // 开始/继续/重开
+        function startGame() {
+            isGameStart=true;
+            startScreen.style.display='none';
+            reward33=reward66=reward88=false;
+        }
+        function togglePause() {
+            if(!isGameStart||isGameOver) return;
+            isPaused = !isPaused;
+            pauseScreen.style.display = isPaused ? 'flex' : 'none';
+            pauseBtn.innerHTML = isPaused ? '▶' : '⏸';
+            showHistory();
+        }
+        function resumeGame() {
+            isPaused=false;
+            pauseScreen.style.display='none';
+            pauseBtn.innerHTML = '⏸';
+        }
+        function restartGame() {
+            birdTop=280; score=0; pipeSpeed=3.2; speedTimer=0;
+            isGameOver=false; isGameStart=true; isPaused=false;
+            reward33=reward66=reward88=false;
+            updateScore();
+            pauseScreen.style.display='none';
+            gameOverScreen.style.display='none';
+            startScreen.style.display='none';
+            pauseBtn.innerHTML = '⏸';
+            pipes.forEach(p=>{p.top.remove();p.bottom.remove();});
+            items.forEach(i=>i.el.remove());
+            pipes=[]; items=[];
+            document.querySelectorAll('.pipe,.item-box').forEach(e=>e.remove());
+        }
+
+        // 核心逻辑
+        function fly(){if(!isGameStart||isGameOver||isPaused)return;birdTop+=jump;}
+        function applyGravity(){if(!isGameStart||isGameOver||isPaused)return;birdTop+=gravity;bird.style.top=birdTop+'px';if(birdTop>650||birdTop<-60)gameOver();}
+        function createPipe(){if(!isGameStart||isGameOver||isPaused)return;const topH=Math.random()*240+70;const bottomTop=topH+pipeGap;const top=document.createElement('div');top.classList.add('pipe');top.style.height=topH+'px';top.style.top='0px';top.style.left='420px';game.appendChild(top);const bottom=document.createElement('div');bottom.classList.add('pipe');bottom.style.height=(650-bottomTop)+'px';bottom.style.top=bottomTop+'px';bottom.style.left='420px';game.appendChild(bottom);pipes.push({top,bottom,x:420});if(Math.random()>0.35)createRandomItem(topH+80,420);}
+        function createRandomItem(y,x){const type=itemTypes[Math.floor(Math.random()*itemTypes.length)];let box=document.createElement('div');box.className='item-box';box.style.top=y+'px';box.style.left=x+'px';let item=document.createElement('div');item.className='item';item.style.backgroundImage=`url('${type.img}')`;let text=document.createElement('div');text.className='item-text';text.innerText=type.text;box.appendChild(item);box.appendChild(text);game.appendChild(box);items.push({el:box,x:x,y:y,score:type.score});}
+        function moveObjects(){if(!isGameStart||isGameOver||isPaused)return;pipes.forEach((pipe,i)=>{pipe.x-=pipeSpeed;pipe.top.style.left=pipe.x+'px';pipe.bottom.style.left=pipe.x+'px';if(pipe.x<-80){pipe.top.remove();pipe.bottom.remove();pipes.splice(i,1);}checkPipeCollision(pipe);});items.forEach((item,i)=>{item.x-=pipeSpeed;item.el.style.left=item.x+'px';if(item.x<-40){item.el.remove();items.splice(i,1);}if(checkItemHit(item)){score+=item.score;updateScore();item.el.remove();items.splice(i,1);}});}
+        function checkPipeCollision(pipe){const b=bird.getBoundingClientRect();const t=pipe.top.getBoundingClientRect();const bm=pipe.bottom.getBoundingClientRect();if((b.right>t.left&&b.left<t.right&&b.top<t.bottom)||(b.right>bm.left&&b.left<bm.right&&b.bottom>bm.top))gameOver();}
+        function checkItemHit(item){const b=bird.getBoundingClientRect();const i=item.el.getBoundingClientRect();return b.left<i.right&&b.right>i.left&&b.top<i.bottom&&b.bottom>i.top;}
+        function increaseSpeed(){if(!isGameStart||isGameOver||isPaused)return;speedTimer++;if(speedTimer%200===0)pipeSpeed+=0.3;}
+
+        // 控制
+        document.addEventListener('click',fly);
+        document.addEventListener('keydown',e=>{if(e.code==='Space')fly();if(e.code==='KeyP')togglePause();});
+        startBtn.onclick=startGame;
+        pauseBtn.onclick=togglePause;
+        resumeBtn.onclick=resumeGame;
+        restartBtn.onclick=restartGame;
+
+        setInterval(applyGravity,24);
+        setInterval(moveObjects,22);
+        setInterval(createPipe,1700);
+        setInterval(increaseSpeed,20);
+    </script>
+</body>
+</html>
